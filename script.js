@@ -26,6 +26,32 @@
     revealTargets.forEach(element => element.classList.add("visible"));
   }
 
+  const cursor = document.querySelector(".custom-cursor");
+  const finePointer = matchMedia("(pointer:fine)").matches;
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (cursor && finePointer && !reducedMotion) {
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+    let targetX = x, targetY = y;
+    window.addEventListener("pointermove", event => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      cursor.classList.add("cursor-visible");
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => cursor.classList.remove("cursor-visible"));
+    const tick = () => {
+      x += (targetX - x) * 0.22;
+      y += (targetY - y) * 0.22;
+      cursor.style.left = x + "px";
+      cursor.style.top = y + "px";
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    document.querySelectorAll("a,button").forEach(element => {
+      element.addEventListener("pointerenter", () => cursor.classList.add("cursor-hover"));
+      element.addEventListener("pointerleave", () => cursor.classList.remove("cursor-hover"));
+    });
+  }
+
   const menu = document.querySelector(".menu-toggle");
   const nav = document.querySelector(".nav");
   if (menu && nav) {
